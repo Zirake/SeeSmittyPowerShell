@@ -30,12 +30,26 @@ Part 1 - https://seesmitty.com/how-to-move-distribution-lists-to-exchange-online
 Part 2 - https://seesmitty.com/how-to-move-distribution-lists-to-exchange-online-part-2/
 #>
 
+param
+(
+    [CmdLetBinding()]
+    [Parameter()][string]$path
+)
+
 
 #connect to Exchange Online
-Connect-ExchangeOnline
+#Connect-ExchangeOnline
 
 #define the path where all exports will be saved
-$path = "C:\temp\DLs"
+if ([string]::IsNullOrEmpty($path)){$path = "C:\temp\DLs"}
+
+#Verify Path
+try {Resolve-Path $path -ErrorAction Stop}
+catch 
+{
+    Write-host "Error, path $path does not exist."
+    exit
+}
 
 #gather our information about our distribution lists
 $onPremDLs = Get-DistributionGroup | Where-Object { ($_.IsDirSynced -EQ $true -and $_.GroupType -ne "Universal, SecurityEnabled")}
